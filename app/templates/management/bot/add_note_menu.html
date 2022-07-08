@@ -1,0 +1,39 @@
+{% load static %}
+{% if select == 'note' %}
+<div class="add_note_container">
+    <form class="add_note_form" method="post" id="addNoteForm">
+        {% csrf_token %}
+        <input type="hidden" value="{{ tg_idx }}" name="tg_idx">
+        <label class="form_label" for="pit_number">Номер шурфа</label>
+        <input class="form_input" type="number" min="1" required id="pit_number" name="pit_number">
+        {% if error %}
+            <span class="error">{{ error }}</span>
+        {% endif %}
+        <label class="form_label" for="names">Кто делал?</label>
+        <select class="form_select" name="names" id="names" multiple required>
+            {% for name in names %}
+            <option value="{{ name.id }}">{{ name.name }}</option>
+            {% endfor %}
+        </select>
+        <label class="form_label" for="object">На каком объекте?</label>
+        <select class="form_select" name="object" id="object" required>
+            {% for object in objects %}
+            <option value="{{ object.id }}">{{ object.name }}</option>
+            {% endfor %}
+        </select>
+        <label class="form_label">Размер шурфа</label>
+        <div class="radio">
+            <input type="radio" id="pit1" name="pitsize" value="1">
+            <label class="form_label" for="pit1">1x1</label>
+            <input type="radio" id="pit2" name="pitsize" value="2" checked>
+            <label class="form_label" for="pit1">2x1</label>
+            <input type="radio" id="pit4" name="pitsize" value="4">
+            <label class="form_label" for="pit1">2x2</label>
+        </div>
+        <label class="form_label" for="depth">Глубина шурфа</label>
+        <input class="form_input" type="number" min="0.1" step="0.1" id="depth" name="pit_depth" required>
+        <button class="form_button" type="submit">Записать</button>
+    </form>
+    <button id="returnToMain" onclick="turnMenu('main')">Главное меню</button>
+</div>
+{% endif %}

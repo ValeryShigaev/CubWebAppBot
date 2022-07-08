@@ -1,0 +1,46 @@
+{% load static %}
+{% if select == 'report' %}
+    <form method="post" id="getReportForm" class="report_form">
+        {% csrf_token %}
+        <label for="from" class="form_label">С какого числа</label>
+        <input type="date" id="from" name="from" class="form_input" required>
+        <label for="from" class="form_label">По какое число</label>
+        <input type="date" id="to" name="to" class="form_input" required>
+        <span class="error">{{ error }}</span>
+        <button class="form_button" type="submit">Получить отчет</button>
+    </form>
+    <div class="reports_container">
+    {% if report %}
+    {% for key, value in report.items %}
+        <div class="report_item">
+            <p class="name">{{key}}</p>
+            {% for item, val in value.items %}
+                {% if item == 'total' %}
+                <p class="name">Итог: {{val}}₽</p>
+                {% endif %}
+            {% endfor %}
+            <p class="name">Объекты:</p>
+            {% for item, val in value.items %}
+                {% if item != 'total' %}
+                    <p class="object_name">{{item}}</p>
+                    {% for res_key, result in val.items %}
+                        {% if res_key == 'pits' %}
+                            <p class="object_name">Шурфы:</p>
+                            <ul class="pits_list">
+                                {% for pit in result %}
+                                    <li><span class="pit_num">№{{pit}}</span></li>
+                                {% endfor %}
+                            </ul>
+                        {% elif res_key == 'total' %}
+                            <p class="object_name">По объекту:</h5>
+                            <p class="object_price">{{result}}₽</h5>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    {% endif %}
+    <button id="returnToMain" onclick="turnMenu('main')">Главное меню</button>
+    </div>
+{% endif %}

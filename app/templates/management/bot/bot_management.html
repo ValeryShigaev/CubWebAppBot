@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bot menu</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{% static 'styles/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/bot_styles.css' %}">
+</head>
+<style>
+    
+</style>
+
+<body>
+<div class="main" id="main">
+    {% if request.user.is_authenticated %}
+        {% include 'management/bot/main_menu.html' %}
+        {% include 'management/bot/employee_menu.html' %}
+        {% include 'management/bot/objects_menu.html' %}
+        {% include 'management/bot/add_note_menu.html' %}
+        {% include 'management/bot/delete_note_menu.html' %}
+        {% include 'management/bot/reports.html' %}
+        {% if check %}
+            <svg xmlns="http://www.w3.org/2000/svg" class="success" viewBox="0 0 80 80" width="80px" height="80px"><path fill="#4caf50" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"/><path fill="#ccff90" d="M34.602,14.602L21,28.199l-5.602-5.598l-2.797,2.797L21,33.801l16.398-16.402L34.602,14.602z"/></svg>
+        {% endif %}
+    {% else %}
+    <form id="authForm" method="GET" class="add_note_form">
+        {% csrf_token %}
+        <label for="logInput" class="form_label">Логин</label>
+        <input class="form_input" type="text" name="login" id="logInput" required>
+        <label for="passInput" class="form_label">Пароль</label>
+        <input class="form_input" type="password" name="pass" id="passInput" required>
+        {% if not log_error or log_error != 'No data' %}
+            <span class="error">Проверьте правильность данных</span>
+        {% endif %}
+        <button class="form_button" type="submit">Войти</button>
+    </form>
+    {% endif %}
+<input id="tg_idx" type="hidden">
+</div>
+<div class="warn" id="warn">
+    <p class="warn_message">Sorry! If you see this, it means that you are using this application for other purposes.</p>
+</div>
+<script src="{% static 'scripts/bot/mainMenu.js'%}"></script>
+<script src ="{% static 'scripts/bot/menuController.js' %}"></script>
+<script src ="{% static 'scripts/bot/removeWorker.js' %}"></script>
+<script src ="{% static 'scripts/bot/addWorker.js' %}"></script>
+<script src ="{% static 'scripts/bot/remove_Object.js' %}"></script>
+<script src ="{% static 'scripts/bot/addObject.js' %}"></script>
+<script src ="{% static 'scripts/bot/removeNote.js' %}"></script>
+<script src ="{% static 'scripts/bot/getReport.js' %}"></script>
+<script src ="{% static 'scripts/bot/login.js' %}"></script>
+</body>
+
+</html>

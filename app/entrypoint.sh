@@ -14,6 +14,7 @@ python manage.py flush --no-input
 python manage.py makemigrations --noinput
 python manage.py migrate
 python manage.py loaddata users.json
+python manage.py test
 
 exec "$@"
 fi

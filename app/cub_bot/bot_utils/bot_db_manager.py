@@ -110,7 +110,6 @@ class BotDBManager:
                 price=price
             )
             for name in data["names"]:
-                print(name)
                 new_note.names.add(Employee.objects.get(id=name))
                 new_note.save()
             return None

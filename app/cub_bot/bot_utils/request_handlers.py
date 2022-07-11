@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 from django.contrib.auth import authenticate, login
 from django.http import HttpRequest, QueryDict
@@ -21,19 +21,18 @@ def querydict_to_dict(qdict: QueryDict) -> Dict[str, any]:
     return {key: value for key, value in qdict.items()}
 
 
-def request_handler(request: QueryDict) -> Dict[str, str]:
+def request_handler(data: Dict) -> Dict[str, str]:
     """
     Обрабатывает все запросы, генерирует часть контекста,
     основное - название пункта меню для перехода,
     телеграм id юзера
 
-    :param request: Входящий QueryDict
-    :type request: QueryDict
+    :param data: Входящий QueryDict
+    :type data: Dict
     :rtype: dict[str, str]
     """
 
     context = dict()
-    data = querydict_to_dict(request)
     data_keys = list(data.keys())
     if "section" in data_keys:
         context["select"] = data["section"]
@@ -44,7 +43,7 @@ def request_handler(request: QueryDict) -> Dict[str, str]:
     return context
 
 
-def db_controller(request: QueryDict) -> Union[bool, str]:
+def db_controller(data: Dict, names: List) -> Union[bool, str]:
     """
     Производит работу с БД в зависимости от ключей запроса
     Может вернуть текст ошибки если она произойдет на стороне БД
@@ -56,15 +55,16 @@ def db_controller(request: QueryDict) -> Union[bool, str]:
     Удаление объекта
     Удаление записи
 
-    :param request: Входящий QueryDict
-    :type request: QueryDict
+    :param data: данные из запроса
+    :type data: Dict
+    :param names: имена сотрудников
+    :type data: List
     :rtype: bool, str
     """
 
-    data = querydict_to_dict(request)
     data_keys = list(data.keys())
     if "names" in data_keys:
-        data["names"] = request.getlist("names")
+        data["names"] = names
     if "add_worker" in data_keys:
         return db_manager.add_worker(data["add_worker"])
     if "remove_worker" in data_keys:
@@ -77,20 +77,22 @@ def db_controller(request: QueryDict) -> Union[bool, str]:
         return db_manager.remove_note(data["remove_note"])
 
 
-def add_note_controller(request: QueryDict) -> Union[str, bool]:
+def add_note_controller(data: Dict, names: List) -> Union[str, bool]:
     """
     Добавляет запись. Может вернуть текст
     если такие данные уже есть или произошла ошибка
 
-    :param request: Входящий QueryDict
-    :type request: QueryDict
+    :param data: данные из запроса
+    :type data: Dict
+    :param names: имена сотрудников
+    :type data: List
     :rtype: bool, str
     """
 
-    data = querydict_to_dict(request)
     data_keys = list(data.keys())
     if "pitsize" in data_keys:
-        data["names"] = request.getlist("names")
+        if names:
+            data["names"] = names
         return db_manager.add_note(data)
     return False
 

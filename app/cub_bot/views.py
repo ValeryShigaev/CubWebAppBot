@@ -1,6 +1,6 @@
 from typing import Dict, Union
 
-from django.http import HttpRequest
+from django.http import HttpRequest, QueryDict
 from django.shortcuts import render
 from django.views import View
 
@@ -28,8 +28,11 @@ class BotMenuView(View):
         Логин
         """
 
-        context = request_handler(request.GET)
-        result = db_controller(request.GET)
+        mod_data = self.querydict_to_dict(request.GET)
+        names = (request.getlist("names") if "names" in mod_data.keys()
+                 else None)
+        context = request_handler(mod_data)
+        result = db_controller(mod_data, names)
         error = result if isinstance(result, str) else ""
         queryset = self.generate_queryset(request.GET.get("tg_idx"))
         log_data = login_controller(request)
@@ -48,12 +51,15 @@ class BotMenuView(View):
 
         queryset = self.generate_queryset()
         report = data_to_report(request.POST)
+        mod_data = self.querydict_to_dict(request.POST)
+        names = (request.POST.getlist("names") if "names" in mod_data.keys()
+                 else None)
         if report:
             error = report if isinstance(report, str) else ""
             return render(request, 'management/bot/bot_management.html',
                           {**{"select": "report", "report": report,
                               "error": error}, **queryset})
-        answer = add_note_controller(request.POST)
+        answer = add_note_controller(mod_data, names)
         if answer:
             return render(request, 'management/bot/bot_management.html',
                           {**{"select": "note", "error": self.err_text(answer),
@@ -97,3 +103,15 @@ class BotMenuView(View):
             return "Такие данные уже есть"
         else:
             return answer
+
+    @staticmethod
+    def querydict_to_dict(qdict: QueryDict) -> Dict[str, any]:
+        """
+        Конвертирует Django QueryDict в словарь
+
+        :param qdict: Входящий QueryDict
+        :type qdict: QueryDict
+        :rtype: dict[str, any]
+        """
+
+        return {key: value for key, value in qdict.items()}
